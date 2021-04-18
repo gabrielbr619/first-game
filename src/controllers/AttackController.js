@@ -36,20 +36,38 @@ module.exports = function (io) {
       game.attacks.push({ id: socket.id, x: xAttack, y: yAttack });
       io.emit("draw", game);
 
-      let playerEnemy
+      let playerEnemy = "undefined"
 
       for (let i = 0; i < game.players.length; i++) {
         if (socket.id !== game.players[i].id) {
           playerEnemy = game.players[i];
         }
       }
+
       for (let i = 0; i < game.attacks.length; i++) {
-        if (!playerEnemy == 'undefined') {
+        if (!(playerEnemy === 'undefined')) {
           if (playerEnemy.x == game.attacks[i].x || playerEnemy.x == game.attacks[i].y) {
-            console.log('acertou')
+          if (playerEnemy.life == 0) {
+            player.score+=1
+
+            for (let i = 0; i < game.players.length; i++) {
+              if (game.players[i].id == playerEnemy.id) {
+                io.emit('dead', (playerEnemy.id))
+                game.players.splice(i, 1);
+
+              }
+            }
+            
+          }else{
           playerEnemy.life -=1
-          }  
+          }
+          
+        }else{
+          null
+        }  
+
         }
+
       }
       
 
@@ -65,6 +83,11 @@ module.exports = function (io) {
       }, 200);
     });
 
-    console.log(game.players)
+    
   });
 };
+
+
+function Respawn(){
+
+}
